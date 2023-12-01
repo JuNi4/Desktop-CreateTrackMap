@@ -1,0 +1,17 @@
+:root {
+--ui-font: ui-monospace, "JetBrains Mono", monospace;
+--map-background: #313338;
+--track-occupied: #c03a3e;
+--track-reserved: #d7a232;
+--track-free: #95979e;
+--signal-green: #23a55a;
+--signal-yellow: #d7a232;
+--signal-red: #c03a3e;
+--signal-outline: #1e1f22;
+--portal-color: purple;
+--portal-outline: #1e1f22;
+--station-color: #95979e;
+--station-outline: #1e1f22;
+--train-color: #5865f2;
+--lead-car-color: #3643d0;
+}
