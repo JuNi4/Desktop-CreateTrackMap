@@ -1,4 +1,4 @@
-import pygame, os, sys, time
+import pygame
 
 class toolBar:
 

@@ -1,4 +1,4 @@
-import pygame, numpy as np, time
+#import pygame, numpy as np, time
 from ui import bezier
 from chunks import Chunks
 from vector import vec2,tuple2vec2 as t2v2
