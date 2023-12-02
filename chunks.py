@@ -63,7 +63,7 @@ class Chunks:
     # draw a chunk
     def drawChunk( s, screen:pygame.surface.Surface, cp:vec2, p:vec2, scale:int=1 ):
         # get the chunk
-        cp = cp.int()
+        cp = (cp + s.min).int()
         chunk = s.buffer[cp.y][cp.x]
 
         # scale the chunk

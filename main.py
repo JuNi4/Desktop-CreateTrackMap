@@ -5,6 +5,7 @@ from ui import toolBar, ptd, hover
 from map import CreateTrackMapApi, tracks as map_tracks, signals as map_signals, trains as map_trains, stations as map_stations, portals as map_portals
 from chunks import Chunks
 from vector import vec2,vec3, tuple2vec2 as t2v2, tuple2vec3 as t2v3
+from sort import sort
 
 # TODO: implement hover and click for stations, trains and portals
 # TODO: ( WIP ) Make blocked segments show
@@ -56,12 +57,16 @@ def assembleTrainStationChildren(tracks, trains):
     train_list = []
     station_list = []
 
+    # sort the entries alphabeticly
+    trains = sort(trains["trains"],'so["name"]')[0]
+    stations = sort(tracks["stations"],'so["name"]')[0]
+
     # add all trains
-    for o in trains["trains"]:
+    for o in trains:
         train_list.append(o)
 
     # add all stations
-    for o in tracks["stations"]:
+    for o in stations:
         station_list.append(o)
 
     # update toolbar things
@@ -203,16 +208,17 @@ assembleTrainStationChildren(tracks, trains)
 
 # add all dimensions
 dims = [{"id":"reset","name":"Reset View"}]
+# add all dimensions to the buttons
 for o in config["dimensions"]:
     dims.append({"id":o,"name":config["dimensions"][o]["label"]})
 # navigation button for going to other dimensions
 bar.addButton("nav","Navigation",dims)
 
 # map rebuilding functions
-bar.addButton("map","Map",[{"id":"rebuild_track","name":"Rebuild Track"}])
+bar.addButton("map","Map",[{"id":"browser","name":"Open in Browser"},{"id":"rebuild_track","name":"Rebuild Track"},{"id":"export","name":"Export Map"}])
 
 # about menu
-bar.addButton("about","About",[{"id":"browser","name":"Open in Browser"},{"id":"about","name":"About"},{"id":"help","name":"Help"},{"id":"quit","name":"Quit"}])
+bar.addButton("about","About",[{"id":"about","name":"About"},{"id":"help","name":"Help"},{"id":"quit","name":"Quit"}])
 
 # update layers when corrosponding view button was clicked
 @bar.onButtonClick(parent="view")
@@ -275,6 +281,21 @@ def gotoTrain(id):
 
     cam = pos
 
+# if the open in browser button was pressed
+@bar.onButtonClick("map.browser")
+def openInBrowser(id):
+    log.log(log.sys,f"Opening Website for Create Track Map (at {URL})")
+    # open the website
+    webbrowser.open(URL, new=0, autoraise=True)
+
+@bar.onButtonClick("map.rebuild_track")
+def rebuildTrack(id):
+    global redraw_tracks
+    # tell the renderer to rebuild the track chunks
+    redraw_tracks = True
+    # log happening
+    log.log(log.sys,"Rebuilding Track Chunks...")
+
 # if about is clicked, show about screen
 @bar.onButtonClick(id="about.about")
 def show_about(id):
@@ -295,13 +316,6 @@ def show_about(id):
 
     # set SCENE to about
     SCENE = S_ABOUT
-
-# if the open in browser button was pressed
-@bar.onButtonClick("about.browser")
-def openInBrowser(id):
-    log.log(log.sys,f"Opening Website for Create Track Map (at {URL})")
-    # open the website
-    webbrowser.open(URL, new=0, autoraise=True)
 
 # if the quit button was pressed
 @bar.onButtonClick("about.quit")
@@ -462,22 +476,23 @@ try:
                 redraw_tracks = False
 
             # render a chunks
-            layer_track.drawChunk(screen,vec2(),vec2(),zoom)
-            vc = t2v2(cam)
+            vcf = t2v2(cam_final) # cam pos as vec2
+            vco = t2v2(cam_offset)
             w,h = screen_size
             # render the chunks
-            for x in range(int(w/layer_track.ppc)):
-                for y in range(int(h/layer_track.ppc)):
-                    # get chunk position
-                    pos = vc + vec2(x*layer_track.ppc,y*layer_track.ppc)
-
-                    cp = layer_track.chunkPos( pos )
-
-                    # get position on screen
-                    sp = cp*layer_track.ppc - vc
-
-                    # draw chunk
-                    layer_track.drawChunk( screen, cp, sp, zoom )
+            if layers["tracks"]:
+                for x in range(int(w/(layer_track.ppc/zoom))+1):
+                    for y in range(int(h/(layer_track.ppc/zoom))+1):
+                        ## get the chunk from the camerea pos + x,y
+                        cp = layer_track.chunkPos( vcf ) + vec2(x,y)
+                        ## calculate onscreen position
+                        # absolute chunk position
+                        acp = cp * layer_track.ppc
+                        # chunk position relativ to the camera
+                        sp = vcf+vco - acp
+                        ## draw chunk
+                        try: layer_track.drawChunk( screen, cp, sp, zoom )
+                        except: pass
 
             # draw signals (WIP)
             tmp_style = signal_green, signal_yellow, signal_red, signal_outline, signal_size, signal_border_size
