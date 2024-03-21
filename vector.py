@@ -278,6 +278,12 @@ class vec2:
         x.y /= l
         return x
     
+    def ceil(s):
+        s.x = ceil(s.x)
+        s.y = ceil(s.y)
+
+        return s
+    
     ## Math operators
     #addition
     def __add__(s, b):

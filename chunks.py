@@ -32,18 +32,27 @@ class Chunks:
             for i in range( abs(p.x + 1) ):
                 s.buffer.insert( 0, [] )
             p.y = 0
+        elif p.y > len(s.buffer):
+            for i in range( p.y - len( s.buffer ) ):
+                s.buffer.append([])
+            p.y = -1
         
         # create all the nessecary things
-        for i in range( abs(p.x) - len( s.buffer[p.y] ) ):
-            s.buffer[p.y].append( pygame.surface.Surface( (s.ppc,s.ppc) ) )
-            s.buffer[p.y][i].fill(s.clearCol)
+        if p.x < 0:
+            for i in range( abs(p.x) - len( s.buffer[p.y] ) ):
+                s.buffer[p.y].insert( 0, pygame.surface.Surface( (s.ppc,s.ppc) ) )
+                s.buffer[p.y][0].fill(s.clearCol)
+        elif p.x > len( s.buffer[p.y] ):
+            for i in range( abs(p.x) - len( s.buffer[p.y] ) ):
+                s.buffer[p.y].append( pygame.surface.Surface( (s.ppc,s.ppc) ) )
+                s.buffer[p.y][i].fill(s.clearCol)
 
     def createChunks( s, p1:vec2, p2:vec2 ):
-        r = (p2-p1).int()
+        r = ( (p2-p1)/s.ppc ).ceil()
         # create all chunks from p1 to p2
         for x in range( r.x ):
             for y in range( r.y ):
-                s._addChunk( s.chunkPos( vec2(x,y) ) )
+                s._addChunk( vec2(x,y) )
 
     def drawLine( s, color:vec2, p1:vec2, p2:vec2, size:int=1 ):
         # draw a line in all the chunks but offset
@@ -78,7 +87,7 @@ class Chunks:
     # returns chunk x and y
     def chunkPos( s, p:vec2 ) -> vec2:
         
-        cp = p // s.ppc
+        cp = ( p / s.ppc ).int()
 
         return cp
         

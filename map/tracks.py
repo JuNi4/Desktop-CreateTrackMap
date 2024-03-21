@@ -18,7 +18,6 @@ def chunkPos(x,y):
     return xinChunk,yinChunk,chunkX,chunkY
 
 def drawTracks(tracks, layers, dimension, style) -> Chunks:
-
     track_free, line_thickness, bg = style
     # create chunk storage
     chunks = Chunks(clearColor=bg)
@@ -31,9 +30,11 @@ def drawTracks(tracks, layers, dimension, style) -> Chunks:
         for o in path:
             # check if point is more ore less than max or min
             p = vec2(o["x"], o["y"])
-            if p > max: max = p
-            elif p < min: min = p
-        
+            if p.x > max.x: max.x = p.x
+            if p.y > max.y: max.y = p.y
+            if p.x < min.x: min.x = p.x
+            if p.y < min.y: min.y = p.y
+    
     chunks.createChunks(min,max)
 
     # draw tracks
@@ -54,12 +55,13 @@ def drawTracks(tracks, layers, dimension, style) -> Chunks:
                 pts.append(pos)
             # draw bezier curve
             bezier.bezier(chunks, pts, col, line_thickness, 0.1)
-        elif len(path) < 2:
-            for l in range(len(path)-1):
-                start_pos = vec2(path[l]["x"], path[l]["z"])
-                end_pos = vec2(path[l+1]["x"], path[l+1]["z"])
-                # make a line from a to b
-                chunks.drawLine(col, start_pos, end_pos, line_thickness )
+        # remnent from the time where there was a fast renderer
+        #elif len(path) < 2:
+        #    for l in range(len(path)-1):
+        #        start_pos = vec2(path[l]["x"], path[l]["z"])
+        #        end_pos = vec2(path[l+1]["x"], path[l+1]["z"])
+        #        # make a line from a to b
+        #        chunks.drawLine(col, start_pos, end_pos, line_thickness )
         else:
             start_pos = vec2(path[0]["x"], path[0]["z"])
             end_pos = vec2(path[1]["x"], path[1]["z"])

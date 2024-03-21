@@ -59,6 +59,6 @@ def drawTrains(screen,trains,layers, zoom, cam, style):
             tmp_wagon = eval(wagon)
 
             # get the angle of the car
-            icon.drawIcon(screen,fpos,degrees(asin(b/hyp)),1*train_size*zoom,[train_color,leading_train_color],icon=tmp_wagon)
+            icon.drawIcon(screen,fpos, degrees(asin(b/hyp)), 1*train_size*zoom,[train_color,leading_train_color],icon=tmp_wagon)
 
     return out

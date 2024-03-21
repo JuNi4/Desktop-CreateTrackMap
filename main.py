@@ -413,7 +413,7 @@ try:
                 elif event.type == pygame.MOUSEWHEEL:
                     #print(event.x, event.y)
                     zoom += event.y * zoom_v
-                    if zoom < 0: zoom = 0
+                    if zoom < 0.1: zoom = 0.1
                 # mouse down for moving map
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
@@ -481,18 +481,19 @@ try:
             w,h = screen_size
             # render the chunks
             if layers["tracks"]:
-                for x in range(int(w/(layer_track.ppc/zoom))+1):
-                    for y in range(int(h/(layer_track.ppc/zoom))+1):
+                for x in range( int( w / zoom / layer_track.ppc )+1 ): # w / cs * zoom
+                    for y in range( int( h / zoom / layer_track.ppc )+1 ):
                         ## get the chunk from the camerea pos + x,y
-                        cp = layer_track.chunkPos( vcf ) + vec2(x,y)
+                        cp = layer_track.chunkPos( vcf - vec2(x,y) )
                         ## calculate onscreen position
                         # absolute chunk position
                         acp = cp * layer_track.ppc
                         # chunk position relativ to the camera
-                        sp = vcf+vco - acp
+                        sp = vcf+vco - acp * zoom
                         ## draw chunk
                         try: layer_track.drawChunk( screen, cp, sp, zoom )
-                        except: pass
+                        except Exception as e:
+                            print(e)
 
             # draw signals (WIP)
             tmp_style = signal_green, signal_yellow, signal_red, signal_outline, signal_size, signal_border_size
