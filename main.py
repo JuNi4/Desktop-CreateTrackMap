@@ -81,7 +81,8 @@ from config import *
 try:
     API_POLL_RATE = float(config_api["poll_rate"])
 except:
-    log.log(log.api, "[FATAL ERROR] Poll intervall is not a valid number!", log.col_red)
+    log.log(log.api, "[FATAL ERROR] Poll intervall is not a valid number! Defaulting to 10 seconds.", log.col_red)
+    API_POLL_RATE = 10
 
 log.log(log.sys,"Setting up API")
 log.log(log.api,f"Setting offline path to '{PATH}/api'")
@@ -254,16 +255,16 @@ def gotoTrain(id):
             break
 
     log.log(log.nav,"Jumped to train "+o["name"])
-    
+
     # get car position
     pos = o["cars"][0]["leading"]["location"]
     pos = -pos["x"], -pos["z"]
 
     cam = pos
-        
+
 # if a station was clicked, move camera to it
 @bar.onButtonClick(parent="stations")
-def gotoTrain(id):
+def gotoStation(id):
     # get global vars
     global cam
     # get subid
@@ -319,7 +320,7 @@ def show_about(id):
 
 # if the quit button was pressed
 @bar.onButtonClick("about.quit")
-def openInBrowser(id):
+def aboutQuit(id):
     log.log(log.sys,f"Exiting...",log.col_yellow)
     # open the website
     exit()
@@ -481,19 +482,8 @@ try:
             w,h = screen_size
             # render the chunks
             if layers["tracks"]:
-                for x in range( int( w / zoom / layer_track.ppc )+1 ): # w / cs * zoom
-                    for y in range( int( h / zoom / layer_track.ppc )+1 ):
-                        ## get the chunk from the camerea pos + x,y
-                        cp = layer_track.chunkPos( vcf - vec2(x,y) )
-                        ## calculate onscreen position
-                        # absolute chunk position
-                        acp = cp * layer_track.ppc
-                        # chunk position relativ to the camera
-                        sp = vcf+vco - acp * zoom
-                        ## draw chunk
-                        try: layer_track.drawChunk( screen, cp, sp, zoom )
-                        except Exception as e:
-                            print(e)
+                # ToDo: draw all chunks
+                layer_track.drawChunk(screen, vec2(0, 0), vec2(0, 0))
 
             # draw signals (WIP)
             tmp_style = signal_green, signal_yellow, signal_red, signal_outline, signal_size, signal_border_size
@@ -514,7 +504,7 @@ try:
             tmp_style = portal_color, portal_outline, line_thickness
             tmp_cam = cam, cam_final, cam_offset, dimension
             map_portals.drawPortals(screen,tracks,layers,zoom,tmp_cam,tmp_style)
-            
+
 
             # draw options bar
             bar.draw()

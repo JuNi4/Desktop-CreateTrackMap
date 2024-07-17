@@ -29,12 +29,12 @@ def drawTracks(tracks, layers, dimension, style) -> Chunks:
         path = o["path"]
         for o in path:
             # check if point is more ore less than max or min
-            p = vec2(o["x"], o["y"])
+            p = vec2(o["x"], o["z"])
             if p.x > max.x: max.x = p.x
             if p.y > max.y: max.y = p.y
             if p.x < min.x: min.x = p.x
             if p.y < min.y: min.y = p.y
-    
+
     chunks.createChunks(min,max)
 
     # draw tracks
